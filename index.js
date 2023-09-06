@@ -43,15 +43,6 @@ app.post("/", (req, res) => {
       res.send({ error: "An error occurred" + err });
     });
 
-  // student.insertOne(entry, (err, result) => {
-  //   if (err) {
-  //     console.log("An error occurred: " + err);
-  //     res.send({"error":"An error occurred"+err})
-  //     return;
-  //   }
-  //   console.log("new student has been added: " + result);
-  //   res.send({"message": "user added successfully"});
-  // });
 });
 
 //Retrieving students from database
@@ -74,7 +65,7 @@ app.get("/", (req, res) => {
 });
 
 //Retrieving one student from database with an id
-app.get("/:id", (req, res) => {
+app.get("/", (req, res) => {
   // code logic for retrieving one student
   // Retriveing data from the database
 
@@ -91,7 +82,7 @@ app.get("/:id", (req, res) => {
 });
 
 //Updating students from database the database with an id
-app.patch("/:name", (req, res) => {
+app.patch("/", (req, res) => {
   // Updating data in the database
 
   student
@@ -108,7 +99,7 @@ app.patch("/:name", (req, res) => {
   
 });
 //deleting a specific student
-app.delete("/:name", (req, res) => {
+app.delete("/", (req, res) => {
   // code logic for deleting a specific student
 
   //delete data in the database
