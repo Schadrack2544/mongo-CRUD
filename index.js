@@ -57,6 +57,7 @@ student.find({ name: "Jack" }, (err, result) => {
   console.log("Found student:", result);
   res.send({"message":"Students have been found"});
 });
+});
 
 //Retrieving one student from database with an id
 app.get("/:id", (req, res) => {
