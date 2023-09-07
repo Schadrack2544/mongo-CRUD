@@ -1,7 +1,7 @@
 //const express=require('express');
 import express from "express";
-import mongodb from "mongodb";
-
+import mongodb, { ObjectId } from "mongodb";
+import bodyParser from "body-parser";
 const mongoclient = mongodb.MongoClient;
 const connectionString = "mongodb://127.0.0.1:27017/school";
 //initiating the connection
@@ -23,26 +23,26 @@ const student = connection.db("school").collection("students");
 //CRUD Operations
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
 const port = 4000;
 
 //adding student in the database
-const entry = { name: "Jack", age: 17 };
+//const entry = { name: "San Marino", age: 17 };
 app.post("/", (req, res) => {
   //code logic for creating a student
-
+  const { name, age } = req.body;
   //Create operation
- 
+
   student
-    .insertOne(entry)
+    .insertOne({ name, age })
     .then((result) => {
       console.log("new student has been added: " + result);
-      res.send({ message: "user added successfully" });
+      res.send({ message: "user added successfully", data: result });
     })
     .catch((err) => {
       console.log("An error occurred: " + err);
       res.send({ error: "An error occurred" + err });
     });
-
 });
 
 //Retrieving students from database
@@ -52,11 +52,11 @@ app.get("/", (req, res) => {
   // Retriveing data from the database
 
   student
-    .find(entry)
+    .find()
     .toArray()
     .then((result) => {
       console.log("Found student:", result);
-      res.send({ message: "Students have been found" });
+      res.send({ message: "Students have been found", data: result });
     })
     .catch((error) => {
       console.error("Error reading document:", error);
@@ -65,15 +65,17 @@ app.get("/", (req, res) => {
 });
 
 //Retrieving one student from database with an id
-app.get("/", (req, res) => {
+app.get("/:id", (req, res) => {
   // code logic for retrieving one student
   // Retriveing data from the database
+  const id = req.params.id;
+  const objectId = new ObjectId(id);
 
   student
-    .findOne({ name: "Jack" })
+    .findOne({ _id: objectId })
     .then((result) => {
       console.log("Found student:", result);
-      res.send({ message: "Found student with this id" });
+      res.send({ message: "Found student with this id: " + id, data: result });
     })
     .catch((err) => {
       console.error("Error reading document:", err);
@@ -82,35 +84,37 @@ app.get("/", (req, res) => {
 });
 
 //Updating students from database the database with an id
-app.patch("/", (req, res) => {
+app.patch("/:id", (req, res) => {
   // Updating data in the database
-
+  const id = req.params.id;
+  const objectId = new ObjectId(id);
+  const { name, age } = req.body;
   student
-    .updateOne({ name: "Jack" }, { $set: { age: 21 } })
+    .updateOne({ _id: objectId }, { $set: { age, name } })
     .then((result) => {
       console.log("Successfully updated" + result);
-      res.send({ message: "Student updated successfully!" });
+      res.send({ message: "Student updated successfully!", data: result });
     })
     .catch((error) => {
       console.log("Sorry an error occured" + error);
       res.send({ error: "Sorry an error occured" + error });
     });
-
-  
 });
 //deleting a specific student
-app.delete("/", (req, res) => {
+app.delete("/:id", (req, res) => {
   // code logic for deleting a specific student
-
+  const id = req.params.id;
+  const objectId = new ObjectId(id);
   //delete data in the database
-  student.deleteOne({name: "student"}).then((result)=>{
-    console.log("Successfully deleted " + result);
-    res.send({ "message ": "successfully deleted" });
-  }).catch((error) => {
-    res.send({ "error": "Sorry an error has occured" + error });
-  }
-  );
-
+  student
+    .deleteOne({ _id: objectId })
+    .then((result) => {
+      console.log("Successfully deleted " + result);
+      res.send({ "message ": "successfully deleted", data: result });
+    })
+    .catch((error) => {
+      res.send({ "error": "Sorry an error has occured" + error });
+    });
 });
 //connection.close();
 app.listen(port, () => {
